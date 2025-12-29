@@ -48,9 +48,16 @@
 
         <!-- 초성 선택 -->
         <div class="chosung-section">
-            <p class="chosung-hint" id="chosungHint">
-                <span class="hint-circle">챔피언 검색</span>
-            </p>
+            <!-- 검색창 -->
+            <div class="search-container">
+                <input type="text" id="championSearch" class="search-input" placeholder="챔피언 이름 검색..."
+                    autocomplete="off">
+                <span class="search-clear" id="searchClear" style="display: none;">×</span>
+            </div>
+
+            <div class="chosung-hint" id="chosungHint">
+                <span class="hint-circle">초성 검색</span>
+            </div>
             <div class="chosung-grid" id="chosungGrid">
                 <button class="chosung-btn" data-chosung="ㄱ">ㄱ</button>
                 <button class="chosung-btn" data-chosung="ㄴ">ㄴ</button>

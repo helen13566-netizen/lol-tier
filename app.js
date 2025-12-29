@@ -2,6 +2,8 @@
 let data = null;
 let currentChosung = null;
 
+let searchQuery = '';
+
 // 배경화면 이미지 목록
 const WALLPAPERS = [
     '럭스.jpg',
@@ -35,15 +37,29 @@ const CHOSUNG_MAP = {
 };
 
 // 초성 추출
+// 초성 추출 (낱개 자음 및 완성형 한글 모두 처리)
 function getChosung(char) {
-    const code = char.charCodeAt(0) - 0xAC00;
-    if (code < 0 || code > 11171) return null;
-    const chosungIndex = Math.floor(code / 588);
+    if (!char) return "";
     const chosungs = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
-    const cho = chosungs[chosungIndex];
-    // 쌍자음은 기본 자음으로 매핑
     const mapping = { 'ㄲ': 'ㄱ', 'ㄸ': 'ㄷ', 'ㅃ': 'ㅂ', 'ㅆ': 'ㅅ', 'ㅉ': 'ㅈ' };
+
+    // 이미 초성인 경우
+    if (chosungs.includes(char)) {
+        return mapping[char] || char;
+    }
+
+    const code = char.charCodeAt(0) - 0xAC00;
+    if (code < 0 || code > 11171) return char; // 한글이 아니면 그대로 반환
+
+    const chosungIndex = Math.floor(code / 588);
+    const cho = chosungs[chosungIndex];
     return mapping[cho] || cho;
+}
+
+// 문자열 전체를 초성으로 변환
+function getFullChosung(str) {
+    if (!str) return "";
+    return str.split('').map(char => getChosung(char)).join('');
 }
 
 // DOM 요소
@@ -51,6 +67,9 @@ const chosungGrid = document.getElementById('chosungGrid');
 const championListEl = document.getElementById('championList');
 const wallpaperBtn = document.getElementById('wallpaperBtn');
 const wallpaperListEl = document.getElementById('wallpaperList');
+const searchInput = document.getElementById('championSearch');
+const searchClear = document.getElementById('searchClear');
+
 
 // 배경화면 선택 토글
 function toggleWallpaperSelection() {
@@ -118,14 +137,47 @@ function loadData() {
 // 티어 순서 정의
 const TIER_ORDER = { 'S+': 0, 'S': 1, 'A': 2, 'B': 3, 'C': 4, 'D': 5, 'N/A': 6 };
 
-// 초성으로 챔피언 필터링 및 티어별 정렬
-function filterChampionsByChosung(chosung) {
+// 챔피언 필터링 및 티어별 정렬
+function filterAndSortChampions(chosung = null, query = '') {
     if (!data) return [];
-    return Object.keys(data.champions).filter(name => {
-        const firstChar = name.charAt(0);
-        return getChosung(firstChar) === chosung;
-    }).sort((a, b) => {
-        // 티어별 정렬
+
+    let champions = Object.keys(data.champions);
+
+    // 초성 필터링
+    if (chosung) {
+        champions = champions.filter(name => {
+            const firstChar = name.charAt(0);
+            return getChosung(firstChar) === chosung;
+        });
+    }
+
+    // 텍스트 검색 필터링
+    if (query) {
+        const lowerQuery = query.toLowerCase();
+        const queryChosung = getFullChosung(lowerQuery);
+        const hangulOnly = /^[가-힣\s]+$/.test(lowerQuery);
+        const isQueryPureChosung = !hangulOnly && /^[ㄱ-ㅎ\s]+$/.test(lowerQuery);
+
+        champions = champions.filter(name => {
+            // 한글 이름 매칭
+            if (name.toLowerCase().startsWith(lowerQuery)) return true;
+
+            // 영어 이름 매칭
+            const enName = CHAMPION_EN[name];
+            if (enName && enName.toLowerCase().startsWith(lowerQuery)) return true;
+
+            // 초성 검색 매칭 (검색어가 초성으로만 구성된 경우)
+            if (isQueryPureChosung) {
+                const nameChosung = getFullChosung(name);
+                if (nameChosung.startsWith(queryChosung)) return true;
+            }
+
+            return false;
+        });
+    }
+
+    // 티어별 정렬
+    champions.sort((a, b) => {
         const tierA = data.champions[a]?.tier || 'N/A';
         const tierB = data.champions[b]?.tier || 'N/A';
         const tierComparison = TIER_ORDER[tierA] - TIER_ORDER[tierB];
@@ -136,7 +188,15 @@ function filterChampionsByChosung(chosung) {
         }
         return tierComparison;
     });
+
+    return champions;
 }
+
+// 기존 함수와의 호환성 유지
+function filterChampionsByChosung(chosung) {
+    return filterAndSortChampions(chosung, '');
+}
+
 
 // 챔피언 한글-영어 매핑 (Riot CDN용)
 const CHAMPION_EN = {
@@ -240,19 +300,32 @@ function selectChosung(chosung) {
     });
 
     // 챔피언 목록 표시
-    const champions = filterChampionsByChosung(chosung);
+    renderChampionList();
+}
+
+// 챔피언 목록 렌더링
+function renderChampionList() {
+    const champions = filterAndSortChampions(currentChosung, searchQuery);
 
     if (champions.length === 0) {
-        championListEl.style.display = 'none';
+        championListEl.style.display = searchQuery ? 'block' : 'none';
+        if (searchQuery) {
+            championListEl.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🔍</div>
+                    <p>"${searchQuery}"에 대한<br>검색 결과가 없습니다</p>
+                </div>
+            `;
+        }
         return;
     }
 
     championListEl.style.display = 'block';
     championListEl.innerHTML = `
-        <p class="champion-hint" id="championHint">
-            <span class="hint-circle">챔피언을 클릭하여 증강 보기</span>
-        </p>
         <div class="champion-buttons">
+            <div class="champion-hint" style="margin: 0;">
+                <span class="hint-circle">챔피언을 클릭하여 증강 보기</span>
+            </div>
             ${champions.map(c => {
         const champData = data.champions[c];
         const tier = champData ? champData.tier : 'N/A';
@@ -281,6 +354,7 @@ function selectChosung(chosung) {
 
 
 
+
 // 이벤트 리스너
 document.querySelectorAll('.chosung-btn').forEach(btn => {
     btn.addEventListener('click', () => selectChosung(btn.dataset.chosung));
@@ -288,6 +362,38 @@ document.querySelectorAll('.chosung-btn').forEach(btn => {
 
 // 배경화면 버튼 이벤트
 wallpaperBtn.addEventListener('click', toggleWallpaperSelection);
+
+// 검색 입력 이벤트
+searchInput.addEventListener('input', (e) => {
+    searchQuery = e.target.value.trim();
+
+    // 지우기 버튼 표시/숨김
+    searchClear.style.display = searchQuery ? 'flex' : 'none';
+
+    // 검색 중이면 초성 선택 해제
+    if (searchQuery) {
+        currentChosung = null;
+        document.querySelectorAll('.chosung-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+    }
+
+    // 검색 결과 표시
+    if (searchQuery) {
+        renderChampionList();
+    } else if (!currentChosung) {
+        championListEl.style.display = 'none';
+    }
+});
+
+// 검색 지우기 버튼 이벤트
+searchClear.addEventListener('click', () => {
+    searchInput.value = '';
+    searchQuery = '';
+    searchClear.style.display = 'none';
+    championListEl.style.display = 'none';
+    searchInput.focus();
+});
 
 // 초기화
 loadData();
