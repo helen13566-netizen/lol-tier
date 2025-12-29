@@ -76,7 +76,7 @@ function renderWallpapers() {
         <div class="wallpaper-grid">
             ${WALLPAPERS.map(filename => `
                 <div class="wallpaper-item ${filename === savedWallpaper ? 'selected' : ''}" onclick="selectWallpaper('${filename}')">
-                    <img src="배경화면/${filename}" alt="${filename}">
+                    <img src="./배경화면/${filename}" alt="${filename}">
                 </div>
             `).join('')}
         </div>
@@ -89,7 +89,7 @@ function selectWallpaper(filename) {
     localStorage.setItem('selectedWallpaper', filename);
 
     // 배경화면 변경
-    document.body.style.setProperty('--bg-image', `url('배경화면/${filename}')`);
+    document.body.style.setProperty('--bg-image', `url('./배경화면/${filename}')`);
 
     // 선택된 항목 표시 업데이트
     document.querySelectorAll('.wallpaper-item').forEach(item => {
@@ -102,7 +102,7 @@ function selectWallpaper(filename) {
 function loadSavedWallpaper() {
     const savedWallpaper = localStorage.getItem('selectedWallpaper');
     if (savedWallpaper) {
-        document.body.style.setProperty('--bg-image', `url('배경화면/${savedWallpaper}')`);
+        document.body.style.setProperty('--bg-image', `url('./배경화면/${savedWallpaper}')`);
     }
 }
 
