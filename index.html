@@ -44,16 +44,13 @@
             <p class="subtitle">아수라장 증강 추천</p>
         </header>
 
-        <!-- 배경화면 선택 -->
-        <div class="wallpaper-section">
-            <button class="wallpaper-btn" id="wallpaperBtn">🖼️</button>
-        </div>
-
-        <!-- 배경화면 썸네일 그리드 -->
         <div id="wallpaperList" class="wallpaper-list" style="display: none;"></div>
 
         <!-- 초성 선택 -->
         <div class="chosung-section">
+            <p class="chosung-hint" id="chosungHint">
+                <span class="hint-circle">챔피언 검색</span>
+            </p>
             <div class="chosung-grid" id="chosungGrid">
                 <button class="chosung-btn" data-chosung="ㄱ">ㄱ</button>
                 <button class="chosung-btn" data-chosung="ㄴ">ㄴ</button>
@@ -76,11 +73,26 @@
         <div id="championList" class="champion-list" style="display: none;"></div>
     </div>
 
+    <!-- 배경화면 버튼 (우측 하단 고정) -->
+    <button class="wallpaper-btn-fixed" id="wallpaperBtn">
+        <svg class="wallpaper-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
+            <path d="M21 15L16 10L11 15M3 13L8 8L13 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round" />
+        </svg>
+    </button>
+
+    <!-- 배경화면 썸네일 그리드 -->
+    <div id="wallpaperList" class="wallpaper-list" style="display: none;"></div>
+
 
 
     <script src="champion-tiers.js"></script>
     <script src="data.js"></script>
     <script src="app.js"></script>
+    <script src="chosung-guide.js"></script>
+    <script src="champion-guide.js"></script>
 </body>
 
 </html>

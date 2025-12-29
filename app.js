@@ -70,7 +70,7 @@ function toggleWallpaperSelection() {
 
 // 배경화면 썸네일 그리드 렌더링
 function renderWallpapers() {
-    const savedWallpaper = localStorage.getItem('selectedWallpaper') || '럭스.jpg';
+    const savedWallpaper = localStorage.getItem('selectedWallpaper') || '애쉬.jpg';
 
     wallpaperListEl.innerHTML = `
         <div class="wallpaper-grid">
@@ -249,6 +249,9 @@ function selectChosung(chosung) {
 
     championListEl.style.display = 'block';
     championListEl.innerHTML = `
+        <p class="champion-hint" id="championHint">
+            <span class="hint-circle">챔피언을 클릭하여 증강 보기</span>
+        </p>
         <div class="champion-buttons">
             ${champions.map(c => {
         const champData = data.champions[c];
