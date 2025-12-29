@@ -1,0 +1,581 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 모바일 터치 최적화 */
+* {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #0a0a0f;
+    min-height: 100vh;
+    color: #ffffff;
+    overflow-x: hidden;
+}
+
+/* 럭스 배경 이미지 - 원본 품질 */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-image, url('배경화면/럭스.jpg')) center center / cover no-repeat;
+    opacity: 1.0;
+    pointer-events: none;
+    z-index: -2;
+}
+
+/* 가벼운 비네트 효과만 */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.3) 100%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* 레이아웃 - 왼쪽 패널만 */
+body {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+}
+
+/* 왼쪽 패널 - 강화된 가독성 */
+.left-panel {
+    width: 100%;
+    max-width: 500px;
+    padding: 40px 30px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
+    min-height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+
+/* 헤더 - 심플 */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    font-weight: 400;
+    letter-spacing: 4px;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5), 0 2px 8px rgba(0, 0, 0, 0.8);
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3), 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* 초성 선택 - 미니멀 */
+.chosung-section {
+    margin-bottom: 30px;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+/* 배경화면 선택 */
+.wallpaper-section {
+    margin-bottom: 20px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    text-align: center;
+}
+
+.wallpaper-btn {
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.wallpaper-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+.wallpaper-btn.active {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* 배경화면 목록 */
+.wallpaper-list {
+    margin-bottom: 30px;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.wallpaper-item {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.wallpaper-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.wallpaper-item:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.wallpaper-item.selected {
+    border-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.5);
+}
+
+.wallpaper-item.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #0a0a0f;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.chosung-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+
+.chosung-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    font-weight: 300;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chosung-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.chosung-btn.active {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #ffffff;
+}
+
+/* 챔피언 목록 - 미니멀 */
+.champion-list {
+    margin-bottom: 30px;
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.champion-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.champion-select-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 6px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.75rem;
+    font-weight: 300;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.champion-thumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    flex-shrink: 0;
+}
+
+.champion-select-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+.champion-select-btn:hover .champion-thumb {
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.champion-select-btn.active {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #ffffff;
+}
+
+.champion-select-btn.active .champion-thumb {
+    border-color: rgba(255, 255, 255, 0.8);
+}
+
+/* 챔피언 이름과 티어 배지 래퍼 */
+.champion-name-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.champion-name {
+    font-size: 0.75rem;
+    color: inherit;
+}
+
+/* 티어 배지 */
+.tier-badge {
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
+}
+
+/* S+ 티어 - 빨간색-골드 그라디언트 */
+.tier-badge.tier-splus {
+    background: linear-gradient(135deg, #ff4444, #ff8800, #ffbb00);
+    color: #ffffff;
+    box-shadow: 0 0 8px rgba(255, 68, 68, 0.6);
+}
+
+/* S 티어 - 골드 */
+.tier-badge.tier-s {
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    color: #1a1a1a;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+/* A 티어 - 초록 */
+.tier-badge.tier-a {
+    background: linear-gradient(135deg, #00ff88, #00cc66);
+    color: #1a1a1a;
+    box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+}
+
+/* B 티어 - 파란색 */
+.tier-badge.tier-b {
+    background: linear-gradient(135deg, #44aaff, #2288ff);
+    color: #ffffff;
+    box-shadow: 0 0 8px rgba(68, 170, 255, 0.6);
+}
+
+/* C 티어 - 보라색 */
+.tier-badge.tier-c {
+    background: linear-gradient(135deg, #cc66ff, #aa44ff);
+    color: #ffffff;
+    box-shadow: 0 0 8px rgba(204, 102, 255, 0.6);
+}
+
+/* D 티어 - 회색 */
+.tier-badge.tier-d {
+    background: linear-gradient(135deg, #888888, #666666);
+    color: #ffffff;
+    box-shadow: 0 0 6px rgba(136, 136, 136, 0.5);
+}
+
+/* N/A 티어 - 어두운 회색 */
+.tier-badge.tier-n\/a {
+    background: #333333;
+    color: #999999;
+    box-shadow: none;
+}
+
+
+
+/* 빈 상태 */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-icon {
+    font-size: 2rem;
+    margin-bottom: 16px;
+    opacity: 0.2;
+}
+
+.empty-state p {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.3);
+    line-height: 1.8;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+/* 다중 매칭 */
+.match-list {
+    padding: 30px;
+    text-align: center;
+}
+
+.match-list p {
+    margin-bottom: 20px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
+}
+
+.champion-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.champion-btn {
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+    font-weight: 300;
+}
+
+.champion-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+}
+
+/* 반응형 - 태블릿 */
+@media (max-width: 768px) {
+    .left-panel {
+        padding: 30px 20px;
+        border: none;
+        min-height: 100vh;
+    }
+
+    header h1 {
+        font-size: 1.3rem;
+        letter-spacing: 3px;
+    }
+
+    .subtitle {
+        font-size: 0.75rem;
+        letter-spacing: 1.5px;
+    }
+
+    .wallpaper-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .champion-buttons {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+}
+
+/* 반응형 - 모바일 */
+@media (max-width: 480px) {
+    .left-panel {
+        max-width: 100%;
+        padding: 20px 15px;
+        border: none;
+    }
+
+    header {
+        margin-bottom: 25px;
+    }
+
+    header h1 {
+        font-size: 1.1rem;
+        letter-spacing: 2px;
+        margin-bottom: 6px;
+    }
+
+    .subtitle {
+        font-size: 0.7rem;
+        letter-spacing: 1px;
+    }
+
+    /* 배경화면 버튼 */
+    .wallpaper-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+    }
+
+    /* 배경화면 그리드 - 모바일에서 2열 */
+    .wallpaper-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .wallpaper-item {
+        border-radius: 8px;
+    }
+
+    /* 초성 버튼 크기 조정 */
+    .chosung-grid {
+        gap: 6px;
+    }
+
+    .chosung-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 0.85rem;
+    }
+
+    /* 챔피언 그리드 - 모바일에서 3열 */
+    .champion-buttons {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+
+    .champion-select-btn {
+        padding: 8px 4px;
+        gap: 4px;
+        border-radius: 10px;
+    }
+
+    .champion-thumb {
+        width: 28px;
+        height: 28px;
+    }
+
+    .champion-name {
+        font-size: 0.7rem;
+    }
+
+    .tier-badge {
+        font-size: 0.6rem;
+        padding: 2px 5px;
+        border-radius: 6px;
+    }
+}
+
+/* 반응형 - 아주 작은 화면 */
+@media (max-width: 360px) {
+    .left-panel {
+        padding: 15px 10px;
+    }
+
+    header h1 {
+        font-size: 1rem;
+        letter-spacing: 1.5px;
+    }
+
+    .subtitle {
+        font-size: 0.65rem;
+    }
+
+    .chosung-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
+    }
+
+    .champion-buttons {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .champion-thumb {
+        width: 26px;
+        height: 26px;
+    }
+
+    .champion-name {
+        font-size: 0.65rem;
+    }
+}

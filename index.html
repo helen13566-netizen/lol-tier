@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>아수라장 증강 티어</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- 왼쪽 패널 -->
+    <div class="left-panel">
+        <!-- 헤더 -->
+        <header>
+            <h1>AUGMENT TIER</h1>
+            <p class="subtitle">아수라장 증강 추천</p>
+        </header>
+
+        <!-- 배경화면 선택 -->
+        <div class="wallpaper-section">
+            <button class="wallpaper-btn" id="wallpaperBtn">🖼️</button>
+        </div>
+
+        <!-- 배경화면 썸네일 그리드 -->
+        <div id="wallpaperList" class="wallpaper-list" style="display: none;"></div>
+
+        <!-- 초성 선택 -->
+        <div class="chosung-section">
+            <div class="chosung-grid" id="chosungGrid">
+                <button class="chosung-btn" data-chosung="ㄱ">ㄱ</button>
+                <button class="chosung-btn" data-chosung="ㄴ">ㄴ</button>
+                <button class="chosung-btn" data-chosung="ㄷ">ㄷ</button>
+                <button class="chosung-btn" data-chosung="ㄹ">ㄹ</button>
+                <button class="chosung-btn" data-chosung="ㅁ">ㅁ</button>
+                <button class="chosung-btn" data-chosung="ㅂ">ㅂ</button>
+                <button class="chosung-btn" data-chosung="ㅅ">ㅅ</button>
+                <button class="chosung-btn" data-chosung="ㅇ">ㅇ</button>
+                <button class="chosung-btn" data-chosung="ㅈ">ㅈ</button>
+                <button class="chosung-btn" data-chosung="ㅊ">ㅊ</button>
+                <button class="chosung-btn" data-chosung="ㅋ">ㅋ</button>
+                <button class="chosung-btn" data-chosung="ㅌ">ㅌ</button>
+                <button class="chosung-btn" data-chosung="ㅍ">ㅍ</button>
+                <button class="chosung-btn" data-chosung="ㅎ">ㅎ</button>
+            </div>
+        </div>
+
+        <!-- 챔피언 목록 -->
+        <div id="championList" class="champion-list" style="display: none;"></div>
+    </div>
+
+
+
+    <script src="champion-tiers.js"></script>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
