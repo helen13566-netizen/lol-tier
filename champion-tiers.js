@@ -49,44 +49,4 @@ const CHAMPION_TIERS = {
     '스카너': 'D', '클레드': 'D', '킨드레드': 'D'
 };
 
-// 기본 증강 템플릿 생성
-function createDefaultAugments(tier) {
-    const template = {
-        silver: {
-            "S+": [
-                { name: "강화된 힘", pickRate: 12.5 },
-                { name: "빠른 공격", pickRate: 10.2 },
-                { name: "마법 강화", pickRate: 8.7 }
-            ],
-            "S": [
-                { name: "생존력", pickRate: 6.5 },
-                { name: "기동력", pickRate: 5.3 }
-            ]
-        },
-        gold: {
-            "S+": [
-                { name: "강화된 힘", pickRate: 13.2 },
-                { name: "빠른 공격", pickRate: 10.8 },
-                { name: "마법 강화", pickRate: 9.2 }
-            ],
-            "S": [
-                { name: "생존력", pickRate: 7.0 },
-                { name: "기동력", pickRate: 5.8 }
-            ]
-        },
-        prismatic: {
-            "S+": [
-                { name: "강화된 힘", pickRate: 14.5 },
-                { name: "빠른 공격", pickRate: 11.8 },
-                { name: "마법 강화", pickRate: 10.0 }
-            ],
-            "S": [
-                { name: "생존력", pickRate: 7.8 },
-                { name: "기동력", pickRate: 6.5 }
-            ]
-        }
-    };
 
-    template.tier = tier;
-    return template;
-}

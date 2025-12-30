@@ -1,7 +1,5 @@
-// 데이터
-let data = null;
+// 상태 변수
 let currentChosung = null;
-
 let searchQuery = '';
 
 // 배경화면 이미지 목록
@@ -125,23 +123,16 @@ function loadSavedWallpaper() {
     }
 }
 
-// 데이터 로드
-function loadData() {
-    try {
-        data = AUGMENT_DATA;
-    } catch (error) {
-        console.error('데이터 로드 실패:', error);
-    }
-}
+
 
 // 티어 순서 정의
 const TIER_ORDER = { 'S+': 0, 'S': 1, 'A': 2, 'B': 3, 'C': 4, 'D': 5, 'N/A': 6 };
 
 // 챔피언 필터링 및 티어별 정렬
 function filterAndSortChampions(chosung = null, query = '') {
-    if (!data) return [];
+    if (typeof CHAMPION_TIERS === 'undefined') return [];
 
-    let champions = Object.keys(data.champions);
+    let champions = Object.keys(CHAMPION_TIERS);
 
     // 초성 필터링
     if (chosung) {
@@ -178,8 +169,8 @@ function filterAndSortChampions(chosung = null, query = '') {
 
     // 티어별 정렬
     champions.sort((a, b) => {
-        const tierA = data.champions[a]?.tier || 'N/A';
-        const tierB = data.champions[b]?.tier || 'N/A';
+        const tierA = CHAMPION_TIERS[a] || 'N/A';
+        const tierB = CHAMPION_TIERS[b] || 'N/A';
         const tierComparison = TIER_ORDER[tierA] - TIER_ORDER[tierB];
 
         // 같은 티어면 이름순 정렬
@@ -290,8 +281,18 @@ function getChampionMetaSrcUrl(korName) {
     return `https://cloud.metasrc.com/ko/lol/mayhem/build/${slug}`;
 }
 
-// 초성 선택
+// 초성 선택 (토글 기능 포함)
 function selectChosung(chosung) {
+    // 같은 초성을 다시 누르면 목록 숨기기
+    if (currentChosung === chosung) {
+        currentChosung = null;
+        document.querySelectorAll('.chosung-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        championListEl.style.display = 'none';
+        return;
+    }
+
     currentChosung = chosung;
 
     // 버튼 활성화 상태
@@ -327,8 +328,7 @@ function renderChampionList() {
                 <span class="hint-circle">챔피언을 클릭하여 증강 보기</span>
             </div>
             ${champions.map(c => {
-        const champData = data.champions[c];
-        const tier = champData ? champData.tier : 'N/A';
+        const tier = CHAMPION_TIERS[c] || 'N/A';
         const tierClass = `tier-${tier.toLowerCase().replace('+', 'plus')}`;
 
         return `

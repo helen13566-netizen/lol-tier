@@ -40,14 +40,20 @@
     <div class="left-panel">
         <!-- 헤더 -->
         <header>
-            <h1>AUGMENT TIER</h1>
-            <p class="subtitle">아수라장 증강 추천</p>
+            <a href="./" class="header-link" onclick="location.reload(); return false;">
+                <h1>AUGMENT TIER</h1>
+                <p class="subtitle">아수라장 증강 추천</p>
+            </a>
         </header>
 
         <div id="wallpaperList" class="wallpaper-list" style="display: none;"></div>
 
         <!-- 초성 선택 -->
         <div class="chosung-section">
+            <div class="chosung-hint" id="chosungHint">
+                <span class="hint-circle">챔피언 검색</span>
+            </div>
+
             <!-- 검색창 -->
             <div class="search-container">
                 <input type="text" id="championSearch" class="search-input" placeholder="챔피언 이름 검색..."
@@ -55,9 +61,6 @@
                 <span class="search-clear" id="searchClear" style="display: none;">×</span>
             </div>
 
-            <div class="chosung-hint" id="chosungHint">
-                <span class="hint-circle">초성 검색</span>
-            </div>
             <div class="chosung-grid" id="chosungGrid">
                 <button class="chosung-btn" data-chosung="ㄱ">ㄱ</button>
                 <button class="chosung-btn" data-chosung="ㄴ">ㄴ</button>
@@ -93,10 +96,27 @@
     <!-- 배경화면 썸네일 그리드 -->
     <div id="wallpaperList" class="wallpaper-list" style="display: none;"></div>
 
+    <!-- 파트너 광고 링크 (PC: 우측 상단, 모바일: 하단 중앙) -->
+    <a href="https://www.aicitybuilders.com?ref=31EVGF" target="_blank" rel="noopener"
+        class="partner-link partner-link-pc">
+        <span class="partner-content">
+            <span class="partner-title">이거 완전 핵 아님?</span>
+            <span class="partner-desc">5분만에 쉽게 AI 만들기!</span>
+        </span>
+        <span class="partner-cta">수강하기</span>
+    </a>
+    <a href="https://www.aicitybuilders.com?ref=31EVGF" target="_blank" rel="noopener"
+        class="partner-link partner-link-mobile">
+        <span class="partner-content">
+            <span class="partner-title">이거 완전 핵 아님?</span>
+            <span class="partner-desc">5분만에 쉽게 AI 만들기!</span>
+        </span>
+        <span class="partner-cta">수강하기</span>
+    </a>
+
 
 
     <script src="champion-tiers.js"></script>
-    <script src="data.js"></script>
     <script src="app.js"></script>
     <script src="chosung-guide.js"></script>
     <script src="champion-guide.js"></script>
