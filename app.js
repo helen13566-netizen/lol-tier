@@ -1,3 +1,35 @@
+// Firebase 설정 (사용자의 Firebase 프로젝트 정보를 여기에 입력하세요)
+const firebaseConfig = {
+    apiKey: "AIzaSyAnZW535HHEPLIWP4PqdO0t5DTWGnHsSBE",
+    authDomain: "lol-tier.firebaseapp.com",
+    databaseURL: "https://lol-tier-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "lol-tier",
+    storageBucket: "lol-tier.firebasestorage.app",
+    messagingSenderId: "500586816684",
+    appId: "1:500586816684:web:4ba4ed1b3c233bbaf4eb09"
+};
+
+// 가상 데이터베이스 (Firebase 연결 전까지 사용될 로컬 대체제)
+let globalLikes = {};
+
+// Firebase 초기화 (설정값이 유효할 때만 실행)
+if (typeof firebase !== 'undefined' && firebaseConfig.apiKey !== "YOUR_API_KEY") {
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // 글로벌 좋아요 데이터 실시간 리스너
+    db.ref('wallpaperLikes').on('value', (snapshot) => {
+        globalLikes = snapshot.val() || {};
+        renderWallpapers();
+    });
+} else {
+    console.warn("Firebase 설정이 완료되지 않았습니다. 실시간 공유 기능이 로컬로 작동합니다.");
+    // 기본 가상 데이터 (서버 연결 전까지 임시 시각화용)
+    globalLikes = {
+        '애쉬.jpg': 1542, '진.jpg': 1205, '징크스.jpg': 1180, '아리.jpg': 980, '이즈리얼.jpg': 850
+    };
+}
+
 // 상태 변수
 let currentChosung = null;
 let searchQuery = '';
@@ -16,7 +48,8 @@ const WALLPAPERS = [
 ];
 let wallpaperListVisible = false;
 let favorites = JSON.parse(localStorage.getItem('wallpaperFavorites') || '[]');
-let currentCategory = 'main'; // 'main' or 'browse'
+let userLikes = JSON.parse(localStorage.getItem('wallpaperLikes') || '[]');
+let currentCategory = 'main'; // 'main', 'popular', 'browse'
 let browsePage = 1;
 const ITEMS_PER_PAGE = 8;
 
@@ -103,6 +136,7 @@ function renderWallpapers() {
         </a>
         <div class="wallpaper-categories">
             <button class="cat-btn ${currentCategory === 'main' ? 'active' : ''}" onclick="switchCategory('main')">기본 & 즐겨찾기</button>
+            <button class="cat-btn ${currentCategory === 'popular' ? 'active' : ''}" onclick="switchCategory('popular')">인기 TOP 10</button>
             <button class="cat-btn ${currentCategory === 'browse' ? 'active' : ''}" onclick="switchCategory('browse')">둘러보기</button>
         </div>
         <div class="wallpaper-grid">
@@ -115,6 +149,7 @@ function renderWallpapers() {
             <div class="wallpaper-item selected" data-filename="${savedWallpaper}" onclick="selectWallpaper('${savedWallpaper}')">
                 <img src="./배경화면/${savedWallpaper}" alt="${savedWallpaper}" loading="lazy" decoding="async">
                 <button class="fav-btn ${favorites.includes(savedWallpaper) ? 'active' : ''}" onclick="toggleFavorite(event, '${savedWallpaper}')">★</button>
+                ${renderLikeButton(savedWallpaper)}
             </div>
         `;
 
@@ -127,10 +162,28 @@ function renderWallpapers() {
                     <div class="wallpaper-item" data-filename="${filename}" onclick="selectWallpaper('${filename}')">
                         <img src="./배경화면/${filename}" alt="${filename}" loading="lazy" decoding="async">
                         <button class="fav-btn active" onclick="toggleFavorite(event, '${filename}')">★</button>
+                        ${renderLikeButton(filename)}
                     </div>
                 `;
             });
         }
+    } else if (currentCategory === 'popular') {
+        // 인기 TOP 10 (글로벌 데이터 기준)
+        const top10 = Object.entries(globalLikes)
+            .map(([key, val]) => [key.replace('_', '.'), val]) // DB 키를 파일명으로 복구
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 10);
+
+        top10.forEach(([filename, likes], index) => {
+            html += `
+                <div class="wallpaper-item ${filename === savedWallpaper ? 'selected' : ''}" data-filename="${filename}" onclick="selectWallpaper('${filename}')">
+                    <div class="popular-badge rank-${index + 1}">${index + 1}위</div>
+                    <img src="./배경화면/${filename}" alt="${filename}" loading="lazy" decoding="async">
+                    <button class="fav-btn ${favorites.includes(filename) ? 'active' : ''}" onclick="toggleFavorite(event, '${filename}')">★</button>
+                    ${renderLikeButton(filename)}
+                </div>
+            `;
+        });
     } else {
         // 둘러보기 (페이지네이션 적용)
         const startIndex = (browsePage - 1) * ITEMS_PER_PAGE;
@@ -143,6 +196,7 @@ function renderWallpapers() {
                 <div class="wallpaper-item ${filename === savedWallpaper ? 'selected' : ''}" data-filename="${filename}" onclick="selectWallpaper('${filename}')">
                     <img src="./배경화면/${filename}" alt="${filename}" loading="lazy" decoding="async">
                     <button class="fav-btn ${favorites.includes(filename) ? 'active' : ''}" onclick="toggleFavorite(event, '${filename}')">★</button>
+                    ${renderLikeButton(filename)}
                 </div>
             `;
         });
@@ -159,6 +213,20 @@ function renderWallpapers() {
 
     html += `</div>`;
     wallpaperListEl.innerHTML = html;
+}
+
+// 좋아요 버튼 렌더링 헬퍼
+function renderLikeButton(filename) {
+    const isLiked = userLikes.includes(filename);
+    const dbKey = filename.replace('.', '_');
+    const count = globalLikes[dbKey] || 0;
+
+    return `
+        <button class="like-btn ${isLiked ? 'active' : ''}" onclick="toggleLike(event, '${filename}')">
+            <span class="heart-icon">♥</span>
+            <span class="like-count">${count.toLocaleString()}</span>
+        </button>
+    `;
 }
 
 // 카테고리 전환
@@ -187,6 +255,35 @@ function toggleFavorite(event, filename) {
     }
     localStorage.setItem('wallpaperFavorites', JSON.stringify(favorites));
     renderWallpapers();
+}
+
+// 좋아요 토글
+function toggleLike(event, filename) {
+    event.stopPropagation();
+    const index = userLikes.indexOf(filename);
+    const isAdding = (index === -1);
+
+    if (isAdding) {
+        userLikes.push(filename);
+    } else {
+        userLikes.splice(index, 1);
+    }
+
+    localStorage.setItem('wallpaperLikes', JSON.stringify(userLikes));
+
+    // Firebase DB 업데이트 (로그인 없이도 가능하게 설정된 경우)
+    if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+        const db = firebase.database();
+        const scoreRef = db.ref('wallpaperLikes/' + filename.replace('.', '_')); // Firebase 키에는 점(.) 허용 안됨
+
+        scoreRef.transaction((currentCount) => {
+            return (currentCount || 0) + (isAdding ? 1 : -1);
+        });
+    } else {
+        // 로컬 업데이트 (DB 없을 때)
+        globalLikes[filename] = (globalLikes[filename] || 0) + (isAdding ? 1 : -1);
+        renderWallpapers();
+    }
 }
 
 // 배경화면 선택
