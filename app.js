@@ -67,6 +67,7 @@ const wallpaperBtn = document.getElementById('wallpaperBtn');
 const wallpaperListEl = document.getElementById('wallpaperList');
 const searchInput = document.getElementById('championSearch');
 const searchClear = document.getElementById('searchClear');
+const wallpaperCountBadge = document.getElementById('wallpaperCountBadge');
 
 
 // 배경화면 선택 토글
@@ -147,6 +148,13 @@ function loadSavedWallpaper() {
 }
 
 
+
+// 배경화면 배지 업데이트
+function updateWallpaperBadge() {
+    if (wallpaperCountBadge) {
+        wallpaperCountBadge.textContent = '+' + WALLPAPERS.length;
+    }
+}
 
 // 티어 순서 정의
 const TIER_ORDER = { 'S+': 0, 'S': 1, 'A': 2, 'B': 3, 'C': 4, 'D': 5, 'N/A': 6 };
@@ -435,5 +443,5 @@ searchClear.addEventListener('click', () => {
 });
 
 // 초기화
-loadData();
 loadSavedWallpaper();
+updateWallpaperBadge();
