@@ -90,6 +90,13 @@ function renderWallpapers() {
     const savedWallpaper = localStorage.getItem('selectedWallpaper') || '애쉬.jpg';
 
     wallpaperListEl.innerHTML = `
+        <a href="https://www.aicitybuilders.com/ceo?ref=31EVGF" target="_blank" rel="noopener" class="partner-link partner-in-wallpaper">
+            <span class="partner-cta">AI 건물주 입주하기</span>
+            <span class="partner-content">
+                <span class="partner-title">평범한 직장인에서 AI 건물주로!</span>
+                <span class="partner-desc">코딩 몰라도 OK! 콘텐츠 자동화로 나만의 수익형 채널 구축</span>
+            </span>
+        </a>
         <div class="wallpaper-grid">
             ${WALLPAPERS.map(filename => `
                 <div class="wallpaper-item ${filename === savedWallpaper ? 'selected' : ''}" onclick="selectWallpaper('${filename}')">
@@ -324,6 +331,20 @@ function selectChosung(chosung) {
 function renderChampionList() {
     const champions = filterAndSortChampions(currentChosung, searchQuery);
 
+    const partnerBanner = `
+        <a href="https://www.aicitybuilders.com/ceo?ref=31EVGF" target="_blank" rel="noopener" class="partner-link partner-in-list">
+            <span class="partner-content">
+                <span class="partner-title">AI가 대신 일하는 시대, 1인 기업가 되기!</span>
+                <span class="partner-desc">
+                    <span class="price-eq">45,000원(수강료) ÷ 64개(강의) = </span>
+                    <span class="price-res">703원</span>
+                    <span class="price-unit"> /개</span>
+                </span>
+            </span>
+            <span class="partner-cta">커피 반 값에 배우기</span>
+        </a>
+    `;
+
     if (champions.length === 0) {
         championListEl.style.display = searchQuery ? 'block' : 'none';
         if (searchQuery) {
@@ -332,6 +353,7 @@ function renderChampionList() {
                     <div class="empty-icon">🔍</div>
                     <p>"${searchQuery}"에 대한<br>검색 결과가 없습니다</p>
                 </div>
+                ${partnerBanner}
             `;
         }
         return;
@@ -358,6 +380,7 @@ function renderChampionList() {
                 `;
     }).join('')}
         </div>
+        ${partnerBanner}
     `;
 
     // 챔피언 버튼 이벤트 - 클릭 시 바로 URL 열기
