@@ -101,6 +101,7 @@ function renderWallpapers() {
 }
 
 // 배경화면 선택
+
 function selectWallpaper(filename) {
     // localStorage에 저장
     localStorage.setItem('selectedWallpaper', filename);
@@ -108,11 +109,20 @@ function selectWallpaper(filename) {
     // 배경화면 변경
     document.body.style.setProperty('--bg-image', `url('./배경화면/${filename}')`);
 
+    // 버튼 썸네일 변경
+    const thumbImg = document.getElementById('currentWallpaperThumb');
+    if (thumbImg) {
+        thumbImg.src = `./배경화면/${filename}`;
+    }
+
     // 선택된 항목 표시 업데이트
     document.querySelectorAll('.wallpaper-item').forEach(item => {
         item.classList.remove('selected');
     });
-    event.target.closest('.wallpaper-item').classList.add('selected');
+    if (event && event.target) {
+        const wrapper = event.target.closest('.wallpaper-item');
+        if (wrapper) wrapper.classList.add('selected');
+    }
 }
 
 // 저장된 배경화면 로드
@@ -120,6 +130,12 @@ function loadSavedWallpaper() {
     const savedWallpaper = localStorage.getItem('selectedWallpaper');
     if (savedWallpaper) {
         document.body.style.setProperty('--bg-image', `url('./배경화면/${savedWallpaper}')`);
+
+        // 버튼 썸네일 변경
+        const thumbImg = document.getElementById('currentWallpaperThumb');
+        if (thumbImg) {
+            thumbImg.src = `./배경화면/${savedWallpaper}`;
+        }
     }
 }
 
