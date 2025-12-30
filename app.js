@@ -4,17 +4,21 @@ let searchQuery = '';
 
 // 배경화면 이미지 목록
 const WALLPAPERS = [
-    '럭스.jpg',
-    '블리츠.jpg',
-    '아리.jpg',
-    '아칼리.jpg',
-    '애쉬.jpg',
-    '조이.jpg',
-    '징크스.jpg',
-    '티모.jpg',
-    '펭구가렌.jpg'
+    '가렌.jpg', '갈리오.jpg', '갱플랭크.jpg', '그라가스.jpg', '그레이브즈.jpg', '그웬.jpg',
+    '나미.jpg', '나서스.jpg', '니달리.jpg', '니코.jpg', '럭스.jpg', '럭스1.jpg',
+    '르블랑.jpg', '마스터이.jpg', '문도박사.jpg', '미스포츈.jpg', '미스포츈1.jpg',
+    '블라디미르.jpg', '블리츠.jpg', '비에고.jpg', '세라핀.jpg', '소나.jpg',
+    '아리.jpg', '아리1.jpg', '아리2.jpg', '아무무.jpg', '아칼리.jpg', '아트록스.jpg',
+    '애쉬.jpg', '요네.jpg', '요네1.jpg', '워윅.jpg', '이즈리얼.jpg', '이즈리얼1.jpg',
+    '잔나.jpg', '조이.jpg', '진.jpg', '징크스.jpg', '초가스.jpg', '카서스.jpg',
+    '케이틀린.jpg', '타릭.jpg', '티모.jpg', '판테온.jpg', '펭구가렌.jpg',
+    '하이머딩거.jpg', '흐웨이.jpg', '흐웨이1.jpg'
 ];
 let wallpaperListVisible = false;
+let favorites = JSON.parse(localStorage.getItem('wallpaperFavorites') || '[]');
+let currentCategory = 'main'; // 'main' or 'browse'
+let browsePage = 1;
+const ITEMS_PER_PAGE = 8;
 
 // 초성 매핑
 const CHOSUNG_MAP = {
@@ -79,7 +83,6 @@ function toggleWallpaperSelection() {
 
     // 배경화면 목록 표시/숨김
     if (wallpaperListVisible) {
-        renderWallpapers();
         wallpaperListEl.style.display = 'block';
     } else {
         wallpaperListEl.style.display = 'none';
@@ -90,7 +93,7 @@ function toggleWallpaperSelection() {
 function renderWallpapers() {
     const savedWallpaper = localStorage.getItem('selectedWallpaper') || '애쉬.jpg';
 
-    wallpaperListEl.innerHTML = `
+    let html = `
         <a href="https://www.aicitybuilders.com/ceo?ref=31EVGF" target="_blank" rel="noopener" class="partner-link partner-in-wallpaper">
             <span class="partner-cta">AI 건물주 입주하기</span>
             <span class="partner-content">
@@ -98,14 +101,92 @@ function renderWallpapers() {
                 <span class="partner-desc">코딩 몰라도 OK! 콘텐츠 자동화로 나만의 수익형 채널 구축</span>
             </span>
         </a>
-        <div class="wallpaper-grid">
-            ${WALLPAPERS.map(filename => `
-                <div class="wallpaper-item ${filename === savedWallpaper ? 'selected' : ''}" onclick="selectWallpaper('${filename}')">
-                    <img src="./배경화면/${filename}" alt="${filename}">
-                </div>
-            `).join('')}
+        <div class="wallpaper-categories">
+            <button class="cat-btn ${currentCategory === 'main' ? 'active' : ''}" onclick="switchCategory('main')">기본 & 즐겨찾기</button>
+            <button class="cat-btn ${currentCategory === 'browse' ? 'active' : ''}" onclick="switchCategory('browse')">둘러보기</button>
         </div>
+        <div class="wallpaper-grid">
     `;
+
+    if (currentCategory === 'main') {
+        // 현재 적용된 배경화면
+        html += `
+            <div class="section-title">현재 적용됨</div>
+            <div class="wallpaper-item selected" data-filename="${savedWallpaper}" onclick="selectWallpaper('${savedWallpaper}')">
+                <img src="./배경화면/${savedWallpaper}" alt="${savedWallpaper}" loading="lazy" decoding="async">
+                <button class="fav-btn ${favorites.includes(savedWallpaper) ? 'active' : ''}" onclick="toggleFavorite(event, '${savedWallpaper}')">★</button>
+            </div>
+        `;
+
+        // 즐겨찾기 목록
+        const favList = favorites.filter(f => f !== savedWallpaper);
+        if (favList.length > 0) {
+            html += `<div class="section-title">즐겨찾기</div>`;
+            favList.forEach(filename => {
+                html += `
+                    <div class="wallpaper-item" data-filename="${filename}" onclick="selectWallpaper('${filename}')">
+                        <img src="./배경화면/${filename}" alt="${filename}" loading="lazy" decoding="async">
+                        <button class="fav-btn active" onclick="toggleFavorite(event, '${filename}')">★</button>
+                    </div>
+                `;
+            });
+        }
+    } else {
+        // 둘러보기 (페이지네이션 적용)
+        const startIndex = (browsePage - 1) * ITEMS_PER_PAGE;
+        const endIndex = startIndex + ITEMS_PER_PAGE;
+        const pageItems = WALLPAPERS.slice(startIndex, endIndex);
+        const totalPages = Math.ceil(WALLPAPERS.length / ITEMS_PER_PAGE);
+
+        pageItems.forEach(filename => {
+            html += `
+                <div class="wallpaper-item ${filename === savedWallpaper ? 'selected' : ''}" data-filename="${filename}" onclick="selectWallpaper('${filename}')">
+                    <img src="./배경화면/${filename}" alt="${filename}" loading="lazy" decoding="async">
+                    <button class="fav-btn ${favorites.includes(filename) ? 'active' : ''}" onclick="toggleFavorite(event, '${filename}')">★</button>
+                </div>
+            `;
+        });
+
+        // 페이지네이션 컨트롤
+        html += `
+            <div class="pagination-controls">
+                <button class="page-btn" ${browsePage === 1 ? 'disabled' : ''} onclick="changePage(-1)">이전</button>
+                <span class="page-info">${browsePage} / ${totalPages}</span>
+                <button class="page-btn" ${browsePage === totalPages ? 'disabled' : ''} onclick="changePage(1)">다음</button>
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+    wallpaperListEl.innerHTML = html;
+}
+
+// 카테고리 전환
+function switchCategory(cat) {
+    currentCategory = cat;
+    browsePage = 1; // 카테고리 전환 시 1페이지로 리셋
+    renderWallpapers();
+}
+
+// 페이지 변경
+function changePage(delta) {
+    browsePage += delta;
+    renderWallpapers();
+    // 상단으로 스크롤 (목록 내에서)
+    wallpaperListEl.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 즐겨찾기 토글
+function toggleFavorite(event, filename) {
+    event.stopPropagation(); // 부모 클릭(배경 선택) 방지
+    const index = favorites.indexOf(filename);
+    if (index > -1) {
+        favorites.splice(index, 1);
+    } else {
+        favorites.push(filename);
+    }
+    localStorage.setItem('wallpaperFavorites', JSON.stringify(favorites));
+    renderWallpapers();
 }
 
 // 배경화면 선택
@@ -123,14 +204,10 @@ function selectWallpaper(filename) {
         thumbImg.src = `./배경화면/${filename}`;
     }
 
-    // 선택된 항목 표시 업데이트
+    // 선택된 항목 표시 업데이트 (파일명을 이용해 더욱 정확하게 매칭)
     document.querySelectorAll('.wallpaper-item').forEach(item => {
-        item.classList.remove('selected');
+        item.classList.toggle('selected', item.dataset.filename === filename);
     });
-    if (event && event.target) {
-        const wrapper = event.target.closest('.wallpaper-item');
-        if (wrapper) wrapper.classList.add('selected');
-    }
 }
 
 // 저장된 배경화면 로드
@@ -445,3 +522,4 @@ searchClear.addEventListener('click', () => {
 // 초기화
 loadSavedWallpaper();
 updateWallpaperBadge();
+renderWallpapers(); // 앱 실행 시 미리 렌더링하여 클릭 시 즉시 표시되도록 함
